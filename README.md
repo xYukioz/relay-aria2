@@ -1,4 +1,4 @@
-# relay
+# relay-aria2
 
 seamlessly send your browser downloads to aria2.
 
@@ -15,11 +15,9 @@ seamlessly send your browser downloads to aria2.
 2. load extension in chrome (developer mode → load unpacked)
 3. configure rpc url and token in options
 
-## aria2 command
+## ui recommendation
 
-```
-aria2c --enable-rpc --rpc-secret=SomethingSecure
-```
+for managing your downloads visually, it is highly recommended to use [AriaNg](https://github.com/mayswind/AriaNg) alongside relay-aria2.
 
 ## license
 
