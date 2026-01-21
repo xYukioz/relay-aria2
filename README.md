@@ -10,7 +10,7 @@ bring the power of aria2 to your browser.
 
 it combines the best of both worlds:
 
-- **unlocked power**: download files using aria2's advanced engine without touching a terminal.
+- **easy to use**: download files using aria2's advanced engine without touching a terminal.
 - **seamless**: just click like normal. we handle the cookies, headers, and authentication so downloads just work.
 - **smart filters**: automatically ignore small files (like images) or block specific sites.
 - **clean**: runs quietly in the background.
@@ -20,7 +20,7 @@ it combines the best of both worlds:
 ### step 1: prepare aria2
 make sure aria2 is running with rpc enabled:
 ```bash
-aria2c --enable-rpc --rpc-secret=SomethingSecure
+aria2c --enable-rpc --rpc-allow-origin-all --rpc-listen-all --rpc-listen-port=6800 --rpc-secret=SomethingSecure
 ```
 
 ### step 2: install extension
@@ -31,7 +31,7 @@ click the extension icon -> options, and enter your `rpc url` and `token`.
 
 ## useful tips
 
-- **visualize it**: use [ariang](https://github.com/mayswind/AriaNg) to get a beautiful dashboard for your downloads.
+- **full control**: use [ariang](https://github.com/mayswind/AriaNg) to fully monitor and control your downloads with a powerful interface.
 - **filters**: check the settings if you only want to catch big files (e.g. `.iso`, `.mkv`).
 
 ## license
