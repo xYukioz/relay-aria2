@@ -20,7 +20,7 @@ it combines the best of both worlds:
 ### step 1: prepare aria2
 make sure aria2 is running with rpc enabled:
 ```bash
-aria2c --enable-rpc --rpc-secret=mysecrettoken
+aria2c --enable-rpc --rpc-secret=SomethingSecure
 ```
 
 ### step 2: install extension
