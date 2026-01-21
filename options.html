@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>relay configuration</title>
+    <style>
+        body {
+            background-color: #000000;
+            color: #eeeeee;
+            font-family: monospace;
+            padding: 20px;
+            font-size: 14px;
+        }
+        a {
+            color: #ce5c00;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+        .header {
+            border-bottom: 1px solid #444;
+            padding-bottom: 5px;
+            margin-bottom: 20px;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="password"] {
+            background-color: #000000;
+            color: #eeeeee;
+            border: 1px solid #666;
+            padding: 5px;
+            font-family: monospace;
+            width: 300px;
+        }
+        button {
+            background-color: #000000;
+            color: #eeeeee;
+            border: 1px solid #666;
+            padding: 5px 10px;
+            font-family: monospace;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #222;
+        }
+        .status {
+            margin-top: 10px;
+            color: #00ff00;
+        }
+        .note {
+            color: #888;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        a.link {
+            color: #88ccff;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        configuration options for <span style="color: #00ff00;">relay</span>
+    </div>
+
+    <div class="section">
+        <label>status:</label>
+        <label style="cursor: pointer;">
+            <input type="checkbox" id="enabled">
+            <span id="statusText">enabled</span>
+        </label>
+    </div>
+
+    <div class="section">
+        <label for="rpcUrl">aria2 rpc url:</label>
+        <input type="text" id="rpcUrl" placeholder="http://localhost:6800/jsonrpc">
+        <span id="connectionStatus" style="margin-left: 10px; font-weight: bold;"></span>
+    </div>
+
+    <div class="section">
+        <label for="rpcToken">rpc secret token:</label>
+        <input type="password" id="rpcToken" placeholder="SomethingSecure">
+    </div>
+
+    <div class="section">
+    <div class="section">
+        <label for="minSize">min size to intercept (e.g. 10M, 500K):</label>
+        <input type="text" id="minSize" placeholder="0 (intercept all)" style="width: 150px;">
+    </div>
+
+    <div class="section">
+        <label for="whitelist">whitelist (regex):</label>
+        <input type="text" id="whitelist" placeholder="example\.com|another\.org" style="width: 300px;">
+        <div class="note">only intercept downloads from these sites (leave empty for all)</div>
+    </div>
+
+    <div class="section">
+        <label for="blacklist">blacklist (regex):</label>
+        <input type="text" id="blacklist" placeholder="bad-site\.com|ad-server\.net" style="width: 300px;">
+        <div class="note">never intercept downloads from these sites</div>
+    </div>
+
+    <div class="section">
+        <label for="fileTypes">file types to intercept:</label>
+        <input type="text" id="fileTypes" placeholder="exe,zip,mp4,mkv,iso" style="width: 300px;">
+        <div class="note">comma-separated list (leave empty for all types)</div>
+    </div>
+
+    <div class="section">
+        <label for="downloadDir">download directory:</label>
+        <input type="text" id="downloadDir" placeholder="default" style="width: 300px;">
+        <div class="note">aria2 download path (leave empty for aria2 default)</div>
+    </div>
+
+    <div class="section">
+        <label for="toastPosition">notification position:</label>
+        <select id="toastPosition" style="background-color: #000; color: #eee; border: 1px solid #666; padding: 5px; font-family: monospace;">
+            <option value="top-right">top-right</option>
+            <option value="top-left">top-left</option>
+            <option value="bottom-right">bottom-right</option>
+            <option value="bottom-left">bottom-left</option>
+        </select>
+    </div>
+
+    <div class="section">
+        <button id="saveBtn">[ save ]</button>
+        <button id="exportBtn" style="margin-left: 10px;">[ export ]</button>
+        <button id="importBtn" style="margin-left: 10px;">[ import ]</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+        <span id="msg" class="status" style="margin-left: 15px;"></span>
+    </div>
+
+    <div class="section" style="border-top: 1px solid #444; padding-top: 10px;">
+        <p>links:</p>
+        <p>* <a href="https://aria2.github.io/" target="_blank" class="link" rel="noopener noreferrer">aria2 documentation</a></p>
+        <p>* <a href="https://github.com/aria2/aria2" target="_blank" class="link" rel="noopener noreferrer">source code [aria2]</a></p>
+        <p>* <a href="https://github.com/kewwwal/relay-aria2/" target="_blank" class="link" rel="noopener noreferrer">source code [relay-aria2]</a></p>
+    </div>
+
+    <script src="content.js"></script>
+    <script src="options.js"></script>
+</body>
+</html>

@@ -1,0 +1,33 @@
+{
+    "manifest_version": 2,
+    "name": "relay",
+    "version": "1.0",
+    "description": "seamlessly send downloads to aria2.",
+    "permissions": [
+        "downloads",
+        "storage",
+        "cookies",
+        "http://localhost:6800/*",
+        "<all_urls>",
+        "notifications",
+        "contextMenus"
+    ],
+    "background": {
+        "scripts": [
+            "background.js"
+        ],
+        "persistent": true
+    },
+    "browser_action": {
+        "default_icon": "icon.png",
+        "default_title": "relay"
+    },
+    "options_ui": {
+        "page": "options.html",
+        "open_in_tab": true
+    },
+    "icons": {
+        "48": "icon.png",
+        "128": "icon.png"
+    }
+}
