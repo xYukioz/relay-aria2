@@ -304,16 +304,6 @@ chrome.runtime.onInstalled.addListener(() => {
     });
 });
 
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.action === "test-notification") {
-        notify("relay", "this is a test notification").then((result) => {
-             sendResponse({ status: "sent", result: result });
-        });
-
-        return true;
-    }
-});
-
 chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest) => {
     if (!isActive) {
          suggest();
