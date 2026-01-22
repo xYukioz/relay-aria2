@@ -1,58 +1,99 @@
 const activeNotifications = [];
-const NOTIFICATION_HEIGHT = 100;
 const GAP = 10;
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === "show_notification") {
-        showNotification(request.data);
+        show_notification(request.data);
         sendResponse({status: "received"});
     }
 });
 
-function showNotification(data) {
-    const el = document.createElement('div');
-    el.className = 'relay-notification';
+function show_notification(data) {
+    const host = document.createElement('div');
+    host.className = 'relay-notification-host';
 
-    Object.assign(el.style, {
+    Object.assign(host.style, {
+        all: 'initial',
         position: 'fixed',
-        backgroundColor: '#000000',
-        color: '#eeeeee',
-        fontFamily: 'monospace',
-        fontSize: '13px',
-        padding: '15px',
-        zIndex: '999999',
-        border: '1px solid #444',
-        boxShadow: '0 4px 6px rgba(0,0,0,0.3)',
-        minWidth: '250px',
-        maxWidth: '400px',
-        borderRadius: '4px',
+        zIndex: '2147483647',
         opacity: '0',
-        transition: 'all 0.3s ease-in-out',
+        transition: 'opacity 0.3s ease-in-out',
         pointerEvents: 'none',
-        display: 'flex',
-        flexDirection: 'column',
-        gap: '4px'
+        display: 'block',
+        fontFamily: 'sans-serif',
+        fontSize: '16px'
     });
 
-    const title = data.title || "relay";
-    const message = data.message || "";
+    const shadow = host.attachShadow({mode: 'open'});
+
+    const style = document.createElement('style');
+    style.textContent = `
+        :host {
+            display: block;
+        }
+        .notification-card {
+            background-color: #000000;
+            color: #eeeeee;
+            font-family: monospace, ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', Menlo, courier, sans-serif;
+            font-size: 13px;
+            padding: 15px;
+            border: 1px solid #444;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            min-width: 250px;
+            max-width: 400px;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            box-sizing: border-box;
+            line-height: 1.4;
+            text-align: left;
+        }
+        .header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 4px;
+            margin-bottom: 4px;
+            font-weight: bold;
+            color: #10B981;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .filename {
+            color: #00ff00;
+            word-break: break-all;
+            margin: 2px 0;
+        }
+        .meta {
+            color: #888;
+            font-size: 12px;
+        }
+    `;
+    shadow.appendChild(style);
+
+    const card = document.createElement('div');
+    card.className = 'notification-card';
+
+    const title = escape_html(data.title || "relay");
+    const message = escape_html(data.message || "");
 
     let detailsHtml = '';
     if (data.details) {
-        if (data.details.filename) detailsHtml += `<div style="color:#00ff00; word-break: break-all;">> ${escapeHtml(data.details.filename)}</div>`;
-        if (data.details.size) detailsHtml += `<div style="color:#888;">Size: ${data.details.size}</div>`;
-        if (data.details.source) detailsHtml += `<div style="color:#888;">Source: ${escapeHtml(data.details.source)}</div>`;
+        if (data.details.filename) detailsHtml += `<div class="filename">> ${escape_html(data.details.filename)}</div>`;
+        if (data.details.size) detailsHtml += `<div class="meta">Size: ${escape_html(data.details.size.toString())}</div>`;
+        if (data.details.source) detailsHtml += `<div class="meta">Source: ${escape_html(data.details.source)}</div>`;
     }
 
-    el.innerHTML = `
-        <div style="border-bottom: 1px solid #333; padding-bottom: 4px; margin-bottom: 4px; font-weight: bold; color: #10B981; display:flex; justify-content:space-between;">
-            <span>${escapeHtml(title)}</span>
+    card.innerHTML = `
+        <div class="header">
+            <span>${title}</span>
         </div>
-        <div>${escapeHtml(message)}</div>
+        <div>${message}</div>
         ${detailsHtml}
     `;
 
-    document.body.appendChild(el);
+    shadow.appendChild(card);
+    document.body.appendChild(host);
 
     const pos = data.position || 'top-right';
 
@@ -61,14 +102,14 @@ function showNotification(data) {
     if (notificationsInStack.length >= MAX_NOTIFICATIONS) {
         for (let i = activeNotifications.length - 1; i >= 0; i--) {
             if (activeNotifications[i].position === pos) {
-                removeNotification(activeNotifications[i]);
+                remove_notification(activeNotifications[i]);
                 break;
             }
         }
     }
 
     const notificationData = {
-        element: el,
+        element: host,
         position: pos,
         height: 0
     };
@@ -76,28 +117,28 @@ function showNotification(data) {
     activeNotifications.unshift(notificationData);
 
     requestAnimationFrame(() => {
-        notificationData.height = el.offsetHeight;
-        updatePositions();
-        el.style.opacity = '1';
+        notificationData.height = host.offsetHeight;
+        update_positions();
+        host.style.opacity = '1';
     });
 
     setTimeout(() => {
-        removeNotification(notificationData);
+        remove_notification(notificationData);
     }, 5000);
 }
 
-function removeNotification(data) {
+function remove_notification(data) {
     const index = activeNotifications.indexOf(data);
     if (index > -1) {
         activeNotifications.splice(index, 1);
         data.element.style.opacity = '0';
-        data.element.style.transform = 'scale(0.9)';
+
         setTimeout(() => data.element.remove(), 300);
-        updatePositions();
+        update_positions();
     }
 }
 
-function updatePositions() {
+function update_positions() {
     const stacks = {
         'top-right': 20,
         'top-left': 20,
@@ -108,7 +149,8 @@ function updatePositions() {
     activeNotifications.forEach((item) => {
         const el = item.element;
         const pos = item.position;
-        const currentOffset = stacks[pos];
+            el.style.top = ''; el.style.bottom = ''; el.style.left = ''; el.style.right = '';
+    const currentOffset = stacks[pos];
 
         el.style.top = ''; el.style.bottom = ''; el.style.left = ''; el.style.right = '';
 
@@ -128,7 +170,7 @@ function updatePositions() {
     });
 }
 
-function escapeHtml(text) {
+function escape_html(text) {
     if (!text) return "";
     return text
         .replace(/&/g, "&amp;")

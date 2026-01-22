@@ -7,7 +7,6 @@
         "downloads",
         "storage",
         "cookies",
-        "http://localhost:6800/*",
         "<all_urls>",
         "notifications",
         "contextMenus"

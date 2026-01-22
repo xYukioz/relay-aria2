@@ -12,7 +12,7 @@ function set_state(active) {
     actionAPI.setBadgeBackgroundColor({ color: active ? "#10B981" : "#EF4444" });
 
     if (isActive) {
-        connectWebSocket();
+        connect_ws();
     } else {
         if (socket) socket.close();
     }
@@ -29,7 +29,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
         }
         if (changes.rpcUrl && isActive) {
             if(socket) socket.close();
-            connectWebSocket();
+            connect_ws();
         }
     }
 });
@@ -124,7 +124,7 @@ const gidMap = new Map();
 let socket = null;
 let reconnectTimer = null;
 
-async function connectWebSocket() {
+async function connect_ws() {
     if (socket && (socket.readyState === WebSocket.OPEN || socket.readyState === WebSocket.CONNECTING)) {
         return;
     }
@@ -152,7 +152,7 @@ async function connectWebSocket() {
     socket.onmessage = (event) => {
         try {
             const data = JSON.parse(event.data);
-            handleWsMessage(data);
+            handle_ws_message(data);
         } catch (e) {
             console.error("WS parse error", e);
         }
@@ -161,7 +161,7 @@ async function connectWebSocket() {
     socket.onclose = () => {
         console.log("WebSocket closed");
         socket = null;
-        scheduleReconnect();
+        schedule_reconnect();
     };
 
     socket.onerror = (err) => {
@@ -169,14 +169,14 @@ async function connectWebSocket() {
     };
 }
 
-function scheduleReconnect() {
+function schedule_reconnect() {
     if (reconnectTimer) clearTimeout(reconnectTimer);
     reconnectTimer = setTimeout(() => {
-        if (isActive) connectWebSocket();
+        if (isActive) connect_ws();
     }, 5000);
 }
 
-function handleWsMessage(msg) {
+function handle_ws_message(msg) {
     if (!msg || !msg.method) return;
 
     if (msg.method === "aria2.onDownloadStart") {
@@ -271,7 +271,7 @@ async function send(url, filename, referrer, cookies, fileSize = 0, retryCount =
             }
         }, 1500);
 
-        connectWebSocket();
+        connect_ws();
 
     } catch (error) {
         console.error(`Aria2 request failed (attempt ${retryCount + 1}/${MAX_RETRIES + 1}):`, error);

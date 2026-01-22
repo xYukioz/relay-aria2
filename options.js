@@ -23,7 +23,7 @@ function save() {
       const status = document.getElementById('msg');
       status.textContent = 'saved.';
       render();
-      checkConnection(rpcUrl, rpcToken);
+      check_connection(rpcUrl, rpcToken);
       setTimeout(() => {
         status.textContent = '';
       }, 2000);
@@ -60,12 +60,12 @@ function save() {
       document.getElementById('toastPosition').value = items.toastPosition;
 
       render();
-      checkConnection(items.rpcUrl, items.rpcToken);
+      check_connection(items.rpcUrl, items.rpcToken);
     });
   }
 
   let debounceTimer;
-  function checkConnection(url, token) {
+  function check_connection(url, token) {
       const statusSpan = document.getElementById('connectionStatus');
       statusSpan.textContent = "checking...";
       statusSpan.style.color = "#ffff00";
@@ -103,18 +103,18 @@ function save() {
 
   document.getElementById('enabled').addEventListener('change', render);
 
-  function requestCheck() {
+  function request_check() {
       clearTimeout(debounceTimer);
       debounceTimer = setTimeout(() => {
-          checkConnection(
+          check_connection(
               document.getElementById('rpcUrl').value,
               document.getElementById('rpcToken').value
           );
       }, 500);
   }
 
-  document.getElementById('rpcUrl').addEventListener('input', requestCheck);
-  document.getElementById('rpcToken').addEventListener('input', requestCheck);
+  document.getElementById('rpcUrl').addEventListener('input', request_check);
+  document.getElementById('rpcToken').addEventListener('input', request_check);
 
   document.addEventListener('DOMContentLoaded', load);
   document.getElementById('saveBtn').addEventListener('click', save);

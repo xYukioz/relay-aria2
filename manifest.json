@@ -12,7 +12,6 @@
         "contextMenus"
     ],
     "host_permissions": [
-        "http://localhost:6800/*",
         "<all_urls>"
     ],
     "content_scripts": [
