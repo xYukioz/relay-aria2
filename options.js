@@ -7,7 +7,7 @@ function save() {
     const blacklist = document.getElementById('blacklist').value;
     const fileTypes = document.getElementById('fileTypes').value;
     const downloadDir = document.getElementById('downloadDir').value;
-    const toastPosition = document.getElementById('toastPosition').value;
+    const notificationPosition = document.getElementById('notificationPosition').value;
 
     chrome.storage.local.set({
       enabled: enabled,
@@ -18,7 +18,7 @@ function save() {
       blacklist: blacklist,
       fileTypes: fileTypes,
       downloadDir: downloadDir,
-      toastPosition: toastPosition
+      notificationPosition: notificationPosition
     }, () => {
       const status = document.getElementById('msg');
       status.textContent = 'saved.';
@@ -47,7 +47,7 @@ function save() {
       blacklist: '',
       fileTypes: '',
       downloadDir: '',
-      toastPosition: 'top-right'
+      notificationPosition: 'top-right'
     }, (items) => {
       document.getElementById('enabled').checked = items.enabled;
       document.getElementById('rpcUrl').value = items.rpcUrl;
@@ -57,7 +57,7 @@ function save() {
       document.getElementById('blacklist').value = items.blacklist;
       document.getElementById('fileTypes').value = items.fileTypes;
       document.getElementById('downloadDir').value = items.downloadDir;
-      document.getElementById('toastPosition').value = items.toastPosition;
+      document.getElementById('notificationPosition').value = items.notificationPosition;
 
       render();
       check_connection(items.rpcUrl, items.rpcToken);

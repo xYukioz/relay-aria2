@@ -61,26 +61,19 @@ function sanitize_filename(filename) {
 }
 
 async function notify(title, message, details = null) {
-    const config = await chrome.storage.local.get({ toastPosition: 'top-right' });
+    const config = await chrome.storage.local.get({ notificationPosition: 'top-right' });
 
     chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
         if (tabs && tabs.length > 0) {
-            console.log("Sending toast to tab:", tabs[0].id, "Title:", title);
             chrome.tabs.sendMessage(tabs[0].id, {
                 action: "show_notification",
                 data: {
                     title: title,
                     message: message,
-                    position: config.toastPosition,
+                    position: config.notificationPosition,
                     details: details
                 }
-            }).then(() => {
-                console.log("Toast sent successfully");
-            }).catch((err) => {
-                console.warn("Toast send failed (content script likely missing):", err);
-            });
-        } else {
-            console.warn("No active tab found to send toast");
+            }).catch(() => {});
         }
     });
 
@@ -90,7 +83,7 @@ async function notify(title, message, details = null) {
 chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.create({
         id: "download-with-relay",
-        title: "Download with relay",
+        title: "download with relay",
         contexts: ["link", "image", "video", "audio"]
     });
 });
@@ -100,10 +93,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         const url = info.linkUrl || info.srcUrl;
         if (!url) return;
 
-        console.log("context menu download", url);
-
         const referrer = info.pageUrl;
-
         const cookies = await get_cookies(url);
 
         let filename = null;
@@ -139,13 +129,12 @@ async function connect_ws() {
     try {
         socket = new WebSocket(wsUrl);
     } catch (e) {
-        console.error("WebSocket creation failed", e);
+        console.error("ws creation failed", e);
         scheduleReconnect();
         return;
     }
 
     socket.onopen = () => {
-        console.log("WebSocket connected to Aria2");
         if (reconnectTimer) clearTimeout(reconnectTimer);
     };
 
@@ -154,18 +143,17 @@ async function connect_ws() {
             const data = JSON.parse(event.data);
             handle_ws_message(data);
         } catch (e) {
-            console.error("WS parse error", e);
+            console.error("ws parse error", e);
         }
     };
 
     socket.onclose = () => {
-        console.log("WebSocket closed");
         socket = null;
         schedule_reconnect();
     };
 
     socket.onerror = (err) => {
-        console.error("WebSocket error", err);
+        console.error("ws error", err);
     };
 }
 
@@ -183,17 +171,17 @@ function handle_ws_message(msg) {
         const gid = msg.params[0].gid;
         const info = gidMap.get(gid);
         if (info) {
-             notify("relay", "Download Started", { filename: info.filename, source: new URL(info.url).hostname });
+             notify("relay", "download started", { filename: info.filename, source: new URL(info.url).hostname });
         }
     } else if (msg.method === "aria2.onDownloadComplete") {
         const gid = msg.params[0].gid;
         const info = gidMap.get(gid);
-        notify("relay", "Download Completed", { filename: info ? info.filename : "GID: " + gid });
+        notify("relay", "download completed", { filename: info ? info.filename : "GID: " + gid });
         if(info) gidMap.delete(gid);
     } else if (msg.method === "aria2.onDownloadError") {
         const gid = msg.params[0].gid;
         const info = gidMap.get(gid);
-        notify("relay", "Download Error", { filename: info ? info.filename : "GID: " + gid });
+        notify("relay", "download error", { filename: info ? info.filename : "GID: " + gid });
         if(info) gidMap.delete(gid);
     }
 }
@@ -219,9 +207,12 @@ async function send(url, filename, referrer, cookies, fileSize = 0, retryCount =
     headers.push(`User-Agent: ${navigator.userAgent}`);
 
     const aria2Options = {
-        "out": filename,
         "header": headers
     };
+
+    if (filename) {
+        aria2Options["out"] = filename;
+    }
 
     if (config.downloadDir && config.downloadDir.trim()) {
         aria2Options["dir"] = config.downloadDir.trim();
@@ -245,10 +236,9 @@ async function send(url, filename, referrer, cookies, fileSize = 0, retryCount =
             body: JSON.stringify(rpcData)
         });
         const result = await response.json();
-        console.log("sent to aria2", result);
 
         if (result.error) {
-            throw new Error(result.error.message || "Aria2 returned an error");
+            throw new Error(result.error.message || "aria2 returned an error");
         }
 
         if (result.result) {
@@ -256,7 +246,7 @@ async function send(url, filename, referrer, cookies, fileSize = 0, retryCount =
         }
 
         const sizeStr = fileSize > 0 ? (fileSize / 1024 / 1024).toFixed(2) + " MB" : "";
-        notify("relay", "Request sent", {
+        notify("relay", "request sent", {
             filename: filename || "unknown file",
             size: sizeStr,
             source: new URL(url).hostname
@@ -274,17 +264,16 @@ async function send(url, filename, referrer, cookies, fileSize = 0, retryCount =
         connect_ws();
 
     } catch (error) {
-        console.error(`Aria2 request failed (attempt ${retryCount + 1}/${MAX_RETRIES + 1}):`, error);
+        console.error(`aria2 request failed (attempt ${retryCount + 1}/${MAX_RETRIES + 1}):`, error);
 
         if (retryCount < MAX_RETRIES) {
-            console.log(`Retrying in ${RETRY_DELAY}ms...`);
             setTimeout(() => {
                 send(url, filename, referrer, cookies, fileSize, retryCount + 1);
             }, RETRY_DELAY);
             return;
         }
 
-        notify("relay error", "Failed to connect to aria2 after " + (MAX_RETRIES + 1) + " attempts.");
+        notify("relay error", "failed to connect to aria2 after " + (MAX_RETRIES + 1) + " attempts.");
 
         actionAPI.setBadgeText({ text: "!" });
         actionAPI.setBadgeBackgroundColor({ color: "#EF4444" });
@@ -298,7 +287,7 @@ chrome.runtime.onInstalled.addListener(() => {
     chrome.contextMenus.removeAll(() => {
         chrome.contextMenus.create({
             id: "download-with-relay",
-            title: "Download with relay",
+            title: "download with relay",
             contexts: ["link", "image", "video", "audio"]
         });
     });
@@ -311,7 +300,6 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
     }
 
     if (downloadItem.url.startsWith("blob:") || downloadItem.url.startsWith("data:")) {
-        console.log("Ignored local scheme:", downloadItem.url);
         suggest();
         return;
     }
@@ -333,7 +321,6 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
         const allowedTypes = config.fileTypes.toLowerCase().split(',').map(t => t.trim()).filter(t => t);
         const ext = downloadItem.filename.split('.').pop().toLowerCase();
         if (!allowedTypes.includes(ext)) {
-            console.log("Ignored due to file type filter:", ext, "not in", allowedTypes);
             suggest();
             return;
         }
@@ -356,7 +343,6 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
         try {
             const blRegex = new RegExp(config.blacklist, 'i');
             if (blRegex.test(checkUrl)) {
-                console.log("Ignored due to blacklist:", checkUrl);
                 suggest();
                 return;
             }
@@ -371,7 +357,6 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
          try {
             const wlRegex = new RegExp(config.whitelist, 'i');
              if (!wlRegex.test(checkUrl)) {
-                console.log("Ignored, not in whitelist:", checkUrl);
                 suggest();
                 return;
             }
@@ -383,7 +368,6 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
     }
 
     if (minSizeBytes > 0 && downloadItem.fileSize > 0 && downloadItem.fileSize < minSizeBytes) {
-        console.log("Ignored due to size limit:", downloadItem.fileSize);
         suggest();
         return;
     }
@@ -397,7 +381,7 @@ chrome.downloads.onDeterminingFilename.addListener(async (downloadItem, suggest)
         }
     });
     chrome.downloads.erase({ id: downloadItem.id });
-    console.log("intercepted download", downloadItem.url);
+
 
     const cookies = await get_cookies(downloadItem.url);
     const cleanFilename = sanitize_filename(downloadItem.filename);

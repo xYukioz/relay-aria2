@@ -149,8 +149,7 @@ function update_positions() {
     activeNotifications.forEach((item) => {
         const el = item.element;
         const pos = item.position;
-            el.style.top = ''; el.style.bottom = ''; el.style.left = ''; el.style.right = '';
-    const currentOffset = stacks[pos];
+        const currentOffset = stacks[pos];
 
         el.style.top = ''; el.style.bottom = ''; el.style.left = ''; el.style.right = '';
 
